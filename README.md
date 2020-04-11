@@ -1,4 +1,5 @@
-# Sobre el repositorio!           ![](/images/UtnLogo.png)
+![](/images/UtnLogo.png)
+# Sobre el repositorio!
 
 
 Este repositorio está dedicado a subir los scripts que se vayan generando en el cursado de la materia **Algoritmos Geneticos** en la **Universidad Tecnologica Nacional de Rosario**.
