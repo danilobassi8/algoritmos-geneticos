@@ -119,6 +119,36 @@ def mutacion(hijo):
     return hijo
 
 
+def elitismo():
+    global poblacion, listaFitness, proximaGeneracion, cantElite
+
+
+    # Creamos una copia de la lista fitness, elegimos el mejor, lo borramos
+    # y volvemos a elegir el mejor. Luego sacamos los indices en el arreglo original.
+    # y agregamos en la proximaGeneracion la poblacion en el indice de los mejores.
+    """
+    copiaFitness = listaFitness.copy()
+    mejor1 = max(copiaFitness)
+    indiceMejor1 = listaFitness.index(mejor1)
+
+    copiaFitness.remove(mejor1)
+    mejor2 = max(copiaFitness)
+    indiceMejor2 = listaFitness.index(mejor2)
+
+    proximaGeneracion.append(poblacion[indiceMejor1])
+    proximaGeneracion.append(poblacion[indiceMejor2])
+    """
+    indiceMejor = []
+    copiaFitness = listaFitness.copy()
+    for i in range(cantElite):
+        mejor = max(copiaFitness)
+        indiceMejor.append(listaFitness.index(mejor))
+        copiaFitness.remove(mejor)
+
+    for i in range(cantElite):
+        proximaGeneracion.append(poblacion[indiceMejor[i]])
+
+
 # ------------------- Definiciones de variables ------------------- #
 # arreglo para las graficas
 ejex = []
@@ -143,7 +173,16 @@ p_crossover = 0.75
 p_mutacion = 0.05
 cantIndividuosEnPoblacion = 10
 
+
 # ------------------- Comienzo del programa ------------------- #
+
+hayElitismo = input("¿Hay elitismo? (s/n)")
+if(hayElitismo.lower() == 's'):
+    hayElitismo = True
+    cantElite = 2
+else:
+    hayElitismo = False
+    cantElite = 0
 
 rellenarPoblacionInicial()
 rellenarFuncionesObjetivoYFitness()
@@ -155,7 +194,10 @@ while (terminado == False):
     cantidadCiclos = cantidadCiclos+1
     print("GENERACIÓN ", cantidadCiclos, " LISTA.")
 
-    for i in range(int(len(poblacion)/2)):
+    if(hayElitismo):
+        elitismo()
+
+    for i in range(int((len(poblacion)-cantElite)/2)):
 
         # seleccionar 2 individuos para el cruce
         padres = seleccionarPareja()
@@ -196,9 +238,10 @@ while (terminado == False):
 
 
 # Plotea las graficas.
-plt.plot(ejex, medias, label='Media', linewidth=4, color="red", alpha=0.7)
+plt.plot(ejex, medias, label='Media', linewidth=4, color="red", alpha=0.6)
 plt.plot(ejex, maximos, label='Maximos', linewidth=1, color="blue", alpha=0.2)
-plt.plot(ejex, minimos, label='Minimos', linewidth=1, color="green",  alpha=0.2,)
+plt.plot(ejex, minimos, label='Minimos',
+         linewidth=1, color="green",  alpha=0.2,)
 plt.legend()
 plt.ylabel(' Valor de la Funcion Objetivo ')
 plt.xlabel(' Generación ')
@@ -208,7 +251,8 @@ plt.savefig("Resultado.png")
 
 # segun la variable 'mejor_de_todos' que guarda la mejor FO calculo el mejor cromosoma
 mejor_numero = round((math.sqrt(mejor_de_todos)*(pow(2, 30)-1)))
-print("El maximo resultado obtenido fue: ", mejor_de_todos, " y lo obtuvo el: ", mejor_numero)
+print("El maximo resultado obtenido fue: ",
+      mejor_de_todos, " y lo obtuvo el: ", mejor_numero)
 print("Corresponde con el binario: ", bin(mejor_numero).replace('0b', ''))
 
 
