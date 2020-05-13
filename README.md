@@ -2,7 +2,7 @@
 # Sobre el repositorio!
 
 
-Este repositorio está dedicado a subir los scripts que se vayan generando en el cursado de la materia **Algoritmos Geneticos** en la **Universidad Tecnologica Nacional de Rosario**.
+Este repositorio está dedicado a subir los scripts que se vayan generando en el cursado de la materia **Algoritmos Genéticos** en la **Universidad Tecnologica Nacional de Rosario**.
 
 # Integrantes del grupo:
 |       Miembro         |Legajo                 |Dirección de Correo           |
