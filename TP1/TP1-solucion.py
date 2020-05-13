@@ -136,8 +136,8 @@ def elitismo():
     for i in range(cantElite):
         proximaGeneracion.append(poblacion[indiceMejor[i]])
 
-
-# ------------------- Definiciones de variables ------------------- #
+#
+# ------------------- Definiciones de variables ------------------- # 
 # arreglo para las graficas
 ejex = []
 medias = []
@@ -155,9 +155,9 @@ listaFObjetivo = []
 listaFitness = []
 
 # Parametros.
-cantMaximaGeneraciones = 200
+cantMaximaGeneraciones = 100
 # probabilidades
-p_crossover = 0.75
+p_crossover = 0.9
 p_mutacion = 0.05
 cantIndividuosEnPoblacion = 10
 
@@ -186,7 +186,7 @@ while (terminado == False):
         elitismo()
 
     for i in range(int((len(poblacion)-cantElite)/2)):
-
+    
         # seleccionar 2 individuos para el cruce
         padres = seleccionarPareja()
         # cruzar con cierta probabilidad 2 individuos y obtener descendientes
@@ -253,7 +253,7 @@ filas = {
 
 df = pd.DataFrame(filas, columns=[
     "Generación", "Media", "Maximo", "Binarios", "Minimo"])
-df.to_excel(r"S:\Drive\UTN\5to año - 2020\Trabajos Practicos\Algoritmos Geneticos\Ej 1 - Inicial\DatosExportadosUltimaCorrida.xlsx",
+df.to_excel(r"S:\Drive\UTN\5to año - 2020\Trabajos Practicos\Algoritmos Geneticos\TPS-git\TP1\DatosExportadosUltimaCorrida.xlsx",
             index=False, header=True)
 
 plt.show()
