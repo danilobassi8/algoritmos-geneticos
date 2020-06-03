@@ -4,12 +4,8 @@
 
 Hacer un programa que utilice un Algoritmo Genético Canónico para buscar un máximo de la función:
 
-
-
 f(x) =  ![equation](https://latex.codecogs.com/gif.latex?%28%5Cfrac%7Bx%7D%7B2%5E%7B30%7D-1%7D%29%5E%7B2%7D)
 en el dominio [0, ![equation](https://latex.codecogs.com/gif.latex?%7B2%5E%7B30%7D-1%7D)]
-
-
 
 teniendo en cuenta los siguientes datos:
 <ul>
@@ -21,7 +17,6 @@ teniendo en cuenta los siguientes datos:
 <li>Método de Crossover: 1 Punto </li>
 <li>Método de Mutación: invertida </li>
 </ul>
-
 
 ### Opción A:
 
