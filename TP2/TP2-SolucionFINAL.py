@@ -58,6 +58,17 @@ class Mochila:
         print()
         print(" ----------------------- ")
 
+    def mostrarInfoMinima(self):
+        print(" ----- mochila: " + str(self.binario) +  " -----")
+
+        print("{  ", end="")
+        for obj in self.listaObjetos:
+            print(str(obj.numero) + "  ", end="")
+        print("}")
+        print("Volumen total: " + str(self.volumenOcupado) +
+              " Precio Total: " + str(self.valor))
+        print()
+
 # Obtiene el mejor objeto de la tabla que se mande por parametro.
 
 
@@ -139,6 +150,16 @@ if(b.lower() == 's'):  # se resuelve por metodo exhaustivo.
         if(mejorBinario[i] == '1'):
             mejorMochila.agregarObjeto(tabla[i])
     mejorMochila.mostrar()
+
+    rta = input("¿Desea mostrar la lista de mochilas factibles ordenadas por mejor precio? (S/N): ")
+    if(rta.lower() == 's'):
+        os.system("cls")
+        #ordena el array de mochilas_factibles por su valor.
+        mochilas_factibles.sort(key=lambda x: x.valor, reverse=True)
+
+        #las muestra.
+        for m in mochilas_factibles:
+            m.mostrarInfoMinima()
 
 else:  # se resuelve por el metodo Greedy.
     copiaTabla = tabla.copy()
