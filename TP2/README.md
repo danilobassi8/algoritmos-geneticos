@@ -18,18 +18,15 @@ Para su solución, utilizar un  **procedimiento exhaustivo**  que consiste en ev
 
 2.Resolver el ejercicio anterior usando el  **algoritmo greedy**  y comentar su similitud o no con el exhaustivo.
 
-3.Plantear el problema de la mochila teniendo en cuenta los  **pesos**  en lugar del volumen. Luego,  **dados 3 elementos**, cuyos pesos son:
+3.Plantear el problema de la mochila teniendo en cuenta los  **pesos**  en lugar del volumen. Luego,  **dados 3 elementos**. Los datos son los siguientes:
+|       Objeto       |Peso (grs)                |Valor ($)           |
+|-----------------------|-----------------------|------------------------------|
+|1         		|1800                 |72      |
+| 2       		|600                 |36|
+|  3         	|1200                 |60         |
 
--   1800 grs.,
--   600 grs.
--   y 1200 grs.
+Teniendo en cuenta que la mochila soporta un máximo de  **3000 grs.**  
 
-y cuyos valores son:
-
--   $72,
--   $36
--   y $60 respectivamente, y con una mochila que puede soportar hasta  **3000 grs.**  se pide:
-
+se pide:
 A) Hallar una solución  **utilizando un algoritmo goloso y exhaustivo**.  
-
 B)  **Analizar dicha solución respecto a su grado de optimización**  y elaborar las  **conclusiones**  que considere adecuadas.
