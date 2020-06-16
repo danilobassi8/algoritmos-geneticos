@@ -1,6 +1,12 @@
 import os
+from time import time
+
+tiempoComienzo = 0
+tiempoTotalEjecucion = 0
 
 # volumen y peso se usan indistintamente porque cumplen la misma función.
+
+
 class Objeto:
     def __init__(self, numero, volumen, precio):
         self.numero = numero
@@ -50,13 +56,13 @@ class Mochila:
                 print("    objeto:" + str(obj.numero) + " ---- Precio: " +
                       str(obj.valor) + "  Peso:" + str(obj.volumen))
             print()
-            print("Volumen total: " + str(self.volumenOcupado) +
-                  " Peso Total: " + str(self.valor))
+            print("Peso total: " + str(self.volumenOcupado) +
+                  " Precio Total: " + str(self.valor))
         print()
         print(" ----------------------- ")
 
     def mostrarInfoMinima(self):
-        print(" ----- mochila: " + str(self.binario) +  " -----")
+        print(" ----- mochila: " + str(self.binario) + " -----")
 
         print("{  ", end="")
         for obj in self.listaObjetos:
@@ -122,12 +128,15 @@ os.system("cls")
 
 
 if(b.lower() == 's'):  # se resuelve por metodo exhaustivo.
+    # seteo en el momento que entra
+    tiempoComienzo = time()
+
     mochilas_factibles = []
     mejorValor = 0
     mejorBinario = 0
    # Generación del numero binario
     for i in range(2**len(tabla)):
-        
+
         # zfill rellena con ceros el numero para que sea de 10 digitos.
         numero = bin(i).replace("0b", "").zfill(len(tabla))
 
@@ -143,24 +152,31 @@ if(b.lower() == 's'):  # se resuelve por metodo exhaustivo.
                 mejorBinario = numero
                 mejorValor = mochila.valor
 
-    #regenero la mejor mochila.
+    # regenero la mejor mochila.
     mejorMochila = Mochila(mejorBinario)
     for i in range(len(mejorBinario)):
         if(mejorBinario[i] == '1'):
             mejorMochila.agregarObjeto(tabla[i])
     mejorMochila.mostrar()
 
-    rta = input("¿Desea mostrar la lista de mochilas factibles ordenadas por mejor precio? (S/N): ")
+    # guardo el tiempo de ejecución en este momento.
+    tiempoTotalEjecucion = time() - tiempoComienzo
+
+    rta = input(
+        "¿Desea mostrar la lista de mochilas factibles ordenadas por mejor precio? (S/N): ")
     if(rta.lower() == 's'):
         os.system("cls")
-        #ordena el array de mochilas_factibles por su valor.
+        # ordena el array de mochilas_factibles por su valor.
         mochilas_factibles.sort(key=lambda x: x.valor, reverse=True)
 
-        #las muestra.
+        # las muestra.
         for m in mochilas_factibles:
             m.mostrarInfoMinima()
 
 else:  # se resuelve por el metodo Greedy.
+    # seteo el comienzo del reloj.
+    tiempoComienzo = time()
+
     copiaTabla = tabla.copy()
     # la tabla se copia porque le vamos a ir eliminando sus objetos a medidas que se agreguen.
 
@@ -174,3 +190,9 @@ else:  # se resuelve por el metodo Greedy.
         copiaTabla.remove(objeto)
 
     mochila.mostrar()
+
+    tiempoTotalEjecucion = time() - tiempoComienzo
+
+os.system("cls")
+print(" -- El tiempo total de ejecución fue de: ", end=" ")
+print(tiempoTotalEjecucion)
