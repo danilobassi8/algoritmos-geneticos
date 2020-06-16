@@ -1,9 +1,6 @@
-from copy import deepcopy
 import os
 
 # volumen y peso se usan indistintamente porque cumplen la misma función.
-
-
 class Objeto:
     def __init__(self, numero, volumen, precio):
         self.numero = numero
@@ -130,6 +127,7 @@ if(b.lower() == 's'):  # se resuelve por metodo exhaustivo.
     mejorBinario = 0
    # Generación del numero binario
     for i in range(2**len(tabla)):
+        
         # zfill rellena con ceros el numero para que sea de 10 digitos.
         numero = bin(i).replace("0b", "").zfill(len(tabla))
 
@@ -145,6 +143,7 @@ if(b.lower() == 's'):  # se resuelve por metodo exhaustivo.
                 mejorBinario = numero
                 mejorValor = mochila.valor
 
+    #regenero la mejor mochila.
     mejorMochila = Mochila(mejorBinario)
     for i in range(len(mejorBinario)):
         if(mejorBinario[i] == '1'):
