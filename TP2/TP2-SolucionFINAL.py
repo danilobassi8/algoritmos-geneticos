@@ -128,7 +128,7 @@ os.system("cls")
 
 
 if(b.lower() == 's'):  # se resuelve por metodo exhaustivo.
-    # seteo en el momento que entra
+    # seteo el inicio del reloj.
     tiempoComienzo = time()
 
     mochilas_factibles = []
@@ -193,6 +193,8 @@ else:  # se resuelve por el metodo Greedy.
 
     tiempoTotalEjecucion = time() - tiempoComienzo
 
-os.system("cls")
+print(" -------------------------------------------------------------------------")
 print(" -- El tiempo total de ejecución fue de: ", end=" ")
-print(tiempoTotalEjecucion)
+print(tiempoTotalEjecucion, end="")
+print(" segundos.")
+print(" -------------------------------------------------------------------------")
