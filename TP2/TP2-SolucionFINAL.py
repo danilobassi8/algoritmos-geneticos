@@ -62,14 +62,20 @@ class Mochila:
         print(" ----------------------- ")
 
     def mostrarInfoMinima(self):
+        global parte
         print(" ----- mochila: " + str(self.binario) + " -----")
 
         print("{  ", end="")
         for obj in self.listaObjetos:
             print(str(obj.numero) + "  ", end="")
         print("}")
-        print("Volumen total: " + str(self.volumenOcupado) +
-              " Precio Total: " + str(self.valor))
+
+        if(parte.lower() == 'a'):
+            print("Volumen total: " + str(self.volumenOcupado) +
+                  " Precio Total: " + str(self.valor))
+        else:
+            print("Peso total: " + str(self.volumenOcupado) +
+                  " Precio Total: " + str(self.valor))
         print()
 
 # Obtiene el mejor objeto de la tabla que se mande por parametro.
