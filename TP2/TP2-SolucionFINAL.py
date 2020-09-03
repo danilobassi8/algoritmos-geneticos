@@ -99,7 +99,7 @@ print()
 print(" ---------------------------------------------------- ")
 os.system("cls")
 
-# se elije que tabla y tamaño de mochila utilizar segun si se elije la parte A o B del enunciado.
+# se elije que tabla y volumen (o peso) de la mochila a utilizar segun si se elije la parte A o B del enunciado.
 if(parte.lower() == 'a'):
     tabla = [
         Objeto(1, 150, 20),
@@ -144,7 +144,7 @@ if(b.lower() == 's'):  # se resuelve por metodo exhaustivo.
     for i in range(2**len(tabla)):
 
         # zfill rellena con ceros el numero para que sea de 10 digitos.
-        numero = bin(i).replace("0b", "").zfill(len(tabla))
+        numero = bin(i).replace("0b", "").zfill(len(tabla)) 
 
         mochila = Mochila(numero)
         for j in range(len(numero)):
@@ -158,7 +158,7 @@ if(b.lower() == 's'):  # se resuelve por metodo exhaustivo.
                 mejorBinario = numero
                 mejorValor = mochila.valor
 
-    # regenero la mejor mochila.
+    # regenero la mejor mochila con el mejor binario.
     mejorMochila = Mochila(mejorBinario)
     for i in range(len(mejorBinario)):
         if(mejorBinario[i] == '1'):
@@ -190,14 +190,14 @@ else:  # se resuelve por el metodo Greedy.
 
     # mientras siga habiendo elementos en la copiaTabla.
     while(len(copiaTabla) > 0):
-        objeto = mejorObjetoDeTabla(copiaTabla)
+        objeto = mejorObjetoDeTabla(copiaTabla) #pone el mejor objeto con la mejor proporción volumen-precio
         if(mochila.volumenOcupado+objeto.volumen <= mochila.volumenMaximo):  # si entra
             mochila.agregarObjeto(objeto)
         copiaTabla.remove(objeto)
 
     mochila.mostrar()
 
-    tiempoTotalEjecucion = time() - tiempoComienzo
+    tiempoTotalEjecucion = time() - tiempoComienzo  
 
 print(" -------------------------------------------------------------------------")
 print(" -- El tiempo total de ejecución fue de: ", end=" ")
