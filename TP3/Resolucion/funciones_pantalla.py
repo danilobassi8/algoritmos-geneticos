@@ -6,7 +6,6 @@ RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 tamaño_circulo = 6
 # ---
-
 provincias = []
 provinciaSeleccionada = ''
 
@@ -20,9 +19,9 @@ def DibujaCirculo(p, screen, color):
     global tamaño_circulo
     pygame.draw.circle(screen, color, (p[1], p[2]), tamaño_circulo)
 
-
+    # para que imprima el texto de la provincia.
     textsurface = myfont.render(p[0], False, RED)
-    screen.blit(textsurface, (p[1] + 9, p[2] - 10))
+    screen.blit(textsurface, (p[1] + 10, p[2] - 10))
 
 
 def inicializarPantalla():

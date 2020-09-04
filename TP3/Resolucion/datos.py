@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import math
 
 provincias = [
     # Capital, x , y, posEnExcel
@@ -29,28 +30,28 @@ provincias = [
     ("Viedma", 404, 545, 23),
 ]
 
+# leo los datos del excel y los meto en la variable datos
+dir_file = os.path.dirname(os.path.abspath(__file__))
+dir_db = dir_file + "\TablaCapitales.xlsx"
+datos = pd.read_excel(r"{}".format(dir_db))
 
-def datosExcel():
-    dir_file = os.path.dirname(os.path.abspath(__file__))
-    dir_db = dir_file + "\TablaCapitales.xlsx"
-    data = pd.read_excel(r"{}".format(dir_db))
-    return data
+
 
 # los datos se pueden llamar de la forma: data[0][0]
 # o con el nombre del renglón data['Córdoba'][0]
 
 
 def CalculaDistancia(provA, provB):
-    datos = datosExcel()
+    global datos
     return datos[provA[0]][provB[3]]
 
 
 def CalculaProvMinDistancia(provA, arrayRepetidos):
-    datos = datosExcel()
+    global datos
     prov = provA[0]
 
     provinciaMasCercana = ''
-    distMin = 9999999999999
+    distMin = math.inf
 
     # busco entre todas las distancias la mas corta.
     for p in provincias:
@@ -63,12 +64,24 @@ def CalculaProvMinDistancia(provA, arrayRepetidos):
     # devuelvo la provincia mas cercana y la distancia.
     return provinciaMasCercana, distMin
 
+def mapearRecorrido(recorridoNumerico):
+    recorrido = []
+    for n in recorridoNumerico:
+        recorrido.append(provincias[n])
+    return recorrido
 
-def CalculaDistanciaDeRecorrido(recorrido):
+def CalculaDistanciaDeRecorrido(r):
+    global datos
+
+    # antes de nada, hago que a la distancia del recorrido se le sume la vuelta.
+    recorridoNumerico = r + [r[0]]
+
     distTotal = 0
+    recorrido = mapearRecorrido(recorridoNumerico)
+
     for i in range(len(recorrido) - 1):
         pActual = recorrido[i]
         pProx = recorrido[i + 1]
-        dist = CalculaDistancia(pActual, pProx)
+        dist = datos[pActual[0]][pProx[3]]
         distTotal += dist
     return distTotal
