@@ -150,7 +150,9 @@ def crossover(padres, prob):
         return padres[0], padres[1]
 
 
-def mutacion(hijo, prob):
+def mutacion(hijoOriginal, prob):
+    # hacemos una copia para que no ocurran problemas de referencias de Python
+    hijo = hijoOriginal.copy()
 
     r = random.uniform(0, 1)
     if(r <= prob):
@@ -203,7 +205,7 @@ def Genetico(provincias):
     # Parametros.
     cantMaximaGeneraciones = 200
     p_crossover = 0.75
-    p_mutacion = 0.1
+    p_mutacion = 0.2
     cantIndividuosEnPoblacion = 50
 
     # arreglos para las graficas.
@@ -216,7 +218,7 @@ def Genetico(provincias):
     hayElitismo = input("¿Aplicar elitismo? (s/n): ")
     if(hayElitismo.lower() == 's'):
         hayElitismo = True
-        cantElite = 8
+        cantElite = 10
     else:
         hayElitismo = False
         cantElite = 0
