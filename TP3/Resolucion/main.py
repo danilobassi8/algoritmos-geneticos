@@ -5,7 +5,6 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 import statistics
-import time
 
 # --------------------------- OPCIÓN UNO --------------------------- #
 
@@ -123,7 +122,7 @@ def seleccionarPareja(poblacion, listaFitness):
 
 def Crossover_Ciclico(p1, p2):
 
-    # se copia para reolver problemas ed referencias #
+    # se copia para resolver problemas de referencias #
     hijo = p2.copy()
     indexP1 = 0
     sigue = True
@@ -174,6 +173,24 @@ def mostrarGraficasEnPantalla(ejeX, minimos, maximos, media):
     plt.xlabel(' Generación ')
     plt.show()
 
+def elitismo(poblacion, listaFitness, cantElite):
+    # Creamos una copia de la lista (Fitness u objetivo), elegimos el mejor, lo borramos
+    # y volvemos a elegir el mejor. Luego sacamos los indices en el arreglo original.
+    # y agregamos en la proximaGeneracion la poblacion en el indice de los mejores.
+
+    indiceMejor = []
+    copiaFitness = listaFitness.copy()
+    elites = []
+
+    for i in range(cantElite):
+        mejor = min(copiaFitness)
+        indiceMejor.append(listaFitness.index(mejor))
+        copiaFitness.remove(mejor)
+
+    for i in range(cantElite):
+        elites.append(poblacion[indiceMejor[i]])
+
+    return elites
 
 def Genetico(provincias):
     poblacion = []
@@ -184,9 +201,9 @@ def Genetico(provincias):
     listaFitness = []
 
     # Parametros.
-    cantMaximaGeneraciones = 1000
+    cantMaximaGeneraciones = 200
     p_crossover = 0.75
-    p_mutacion = 0.3
+    p_mutacion = 0.1
     cantIndividuosEnPoblacion = 50
 
     # arreglos para las graficas.
@@ -199,7 +216,7 @@ def Genetico(provincias):
     hayElitismo = input("¿Aplicar elitismo? (s/n): ")
     if(hayElitismo.lower() == 's'):
         hayElitismo = True
-        cantElite = 2
+        cantElite = 8
     else:
         hayElitismo = False
         cantElite = 0
@@ -214,14 +231,14 @@ def Genetico(provincias):
 
     terminado = False
     cantidadCiclos = 0
-    #while (terminado == False):
-    currentTime = time.time()
-    while( time.time() <= currentTime+2160):
+    while (terminado == False):
         cantidadCiclos += 1
         print("GENERACIÓN ", cantidadCiclos, " LISTA.")
 
-        # if(hayElitismo):
-        #    elitismo()
+        # aplica el ELITISMO
+        if(hayElitismo):
+            proximaGeneracion += elitismo(poblacion, listaFObjetivo, cantElite)
+
 
         for i in range(int((len(poblacion) - cantElite) / 2)):
             # seleccionar 2 individuos para el cruce
