@@ -165,11 +165,10 @@ def mutacion(hijoOriginal, prob):
     return hijo
 
 
-def mostrarGraficasEnPantalla(ejeX, minimos, maximos, media, minHistorico):
+def mostrarGraficasEnPantalla(ejeX, minimos, maximos, media):
     plt.plot(ejeX, minimos, label='Minimos', linewidth=4, color="red", alpha=0.6)
     plt.plot(ejeX, maximos, label='Maximos', linewidth=4, color="blue", alpha=0.6)
     plt.plot(ejeX, media, label='Media', linewidth=4, color="green", alpha=0.6)
-    plt.plot(ejeX, minHistorico, label='Mejor Historico', linewidth=4, color="purple", alpha=0.2)
 
     plt.legend()
     plt.ylabel(' Valor de la Funcion Objetivo ')
@@ -204,8 +203,8 @@ def Genetico(provincias):
     listaFitness = []
 
     # Parametros.
-    cantMaximaGeneraciones = 1000
-    p_crossover = 0.9
+    cantMaximaGeneraciones = 200
+    p_crossover = 0.75
     p_mutacion = 0.2
     cantIndividuosEnPoblacion = 50
 
@@ -215,7 +214,6 @@ def Genetico(provincias):
     minimos = []
     maximos = []
     medias = []
-    minHistorico = []
 
     hayElitismo = input("¿Aplicar elitismo? (s/n): ")
     if(hayElitismo.lower() == 's'):
@@ -277,13 +275,12 @@ def Genetico(provincias):
             minimos.append(min(listaFObjetivo))
             maximos.append(max(listaFObjetivo))
             medias.append(statistics.mean(listaFObjetivo))
-            minHistorico.append(distMinima)
 
         if(cantidadCiclos >= cantMaximaGeneraciones):
             terminado = True
 
     if(mostrarGraficas):
-        mostrarGraficasEnPantalla(ejeX, minimos, maximos, medias, minHistorico)
+        mostrarGraficasEnPantalla(ejeX, minimos, maximos, medias)
 
     return datos.mapearRecorrido(MejorRecorrido + [MejorRecorrido[0]]), datos.CalculaDistanciaDeRecorrido(MejorRecorrido)
 # --------------------------- MAIN --------------------------- #
