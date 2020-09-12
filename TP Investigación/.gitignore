@@ -1,0 +1,5 @@
+# Ignoro las carpetas de Extras, donde se guarda información adicional para construir el modelo.
+# ni la carpeta __pycache__. Archivos autogenerados por Python.
+
+Extras/
+__pycache__/
