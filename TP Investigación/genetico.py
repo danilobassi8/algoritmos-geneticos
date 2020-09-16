@@ -20,58 +20,74 @@ class Casillero():
         self.bin = 1 if self.HayGenerador else 0
         self.potenciaGenerada = 0
         self.z0 = params.z0
+        self.vientoAsignado = False
 
 
-def ejecutaViento(m):
-    global casilleros_estela, c_induccion, c_arrastre, radio_estela
-    # recorro los renglones de a una columna a la vez para ver como avanza el viento cada vez que se encuentra con una columna.
-    v0 = params.vel_viento
-
-    for fil in range(10):
-        for col in range(10):
-            casillero = m[fil][col]
-            # si no fue asignado todavía
-            if(casillero.viento == 0):
-                casillero.viento = v0
-                if(casillero.HayGenerador):
-                    # ocupo los casilleros de abajo con el viento correspondiente.
-                    propagaVientoHaciaAbajo(m, casillero, fil, col, v0)
-            else:
-                # si ya está asignado el valor pero hay molino (y esta prendido), propago.
-                if(casillero.HayGenerador and casillero.generador.potenciaGenerada(casillero.viento) != 0):
-                    propagaVientoHaciaAbajo(m, casillero, fil, col, casillero.viento)
-
-
-def propagaVientoHaciaAbajo(m, casillero, fil, col, viento):
-
+def ejecutaViento(cromosoma):
     # traigo los parametros necesarios.
     casilleros_estela = params.casilleros_estela
     const_prop_r_estela = params.const_prop_r_estela
     c_induccion = params.c_induccion
-    v0 = viento
+    v0 = params.vel_viento
+    m = cromosoma.copy()
 
-    for i in range(1, casilleros_estela + 1):
-        pos_fila = fil + i
+    for c in range(10):
+        fila_prop = -1
+        for f in range(10):
+            # fina en la que se propagó ultimo
+            fila_prop += 1
 
-        if(0 <= pos_fila <= 9):
-            if(m[pos_fila][col].HayGenerador == False):
-                # asigno algo como para que ya quede que asigné
-                m[pos_fila][col].viento = 1
-            else:
-                # calculo viento.
-                # cociente
-                coc = 2 * c_induccion
-                # denominador.python
-                gen = m[pos_fila][col].generador
-                alfa = 1 / (2 * math.log(gen.altura / m[pos_fila][col].z0))
-                x = 4 * gen.radio * i
-                r1 = gen.radio * const_prop_r_estela
-                den = (1 + alfa * (x / r1))**2
-                # viento final.
-                vFinal = v0 * (1 - coc / den)
+            if(fila_prop >= f):
+                casillero = m[f][c]
+                if(casillero.vientoAsignado == False):
+                    casillero.viento = v0
 
-                m[pos_fila][col].viento = round(vFinal, 2)
-                break
+                if(casillero.HayGenerador):
+                    # asignar la potencia.
+                    casillero.potenciaGenerada = casillero.generador.potenciaGenerada(casillero.viento)
+
+                    # propagar el viento (SI ESTÁ PRENDIDO).
+                    if(casillero.generador.potenciaGenerada(casillero.viento) > 0):
+                        for i in range(1, casilleros_estela + 1):
+                            pos_fila = f + i
+                            fila_prop += 1
+                        # asigno siempre y cuando no me salga de la matriz de 10x10
+                            if(0 <= pos_fila <= 9):
+                                # calculo su viento.
+                                # cociente
+                                coc = 2 * c_induccion
+                                # denominador
+                                gen = m[pos_fila][c].generador
+                                alfa = 1 / (2 * math.log(gen.altura / m[pos_fila][c].z0))
+                                x = 4 * gen.radio * i
+                                r1 = gen.radio * const_prop_r_estela
+                                den = (1 + alfa * (x / r1))**2
+                                # viento final.
+                                vientoPadre = m[f][c].viento
+                                vFinal = vientoPadre * (1 - coc / den)
+
+                                # le actualizo el viento
+                                m[pos_fila][c].viento = round(vFinal, 2)
+                                m[pos_fila][c].vientoAsignado = True
+
+                                # si tiene generador (Y ESTE ESTÁ PRENDIDO), tengo que parar porque ese propaga hacia abajo.
+                                if(m[pos_fila][c].HayGenerador):
+                                    if(m[pos_fila][c].generador.potenciaGenerada(m[pos_fila][c].viento) > 0):
+                                        break
+
+            # si ya le asigne el viento, no hago nada
+            # recorro los renglones de a una columna a la vez para ver como avanza el viento cada vez que se encuentra con una columna.
+    
+    # una vez terminado, vuelvo a poner vientoAsignado en false.
+    for f in range(10):
+        for c in range(10):
+            m[f][c].vientoAsignado = False
+            # me aseguro de que si no tiene generador, no genera nada.
+            if(m[f][c].HayGenerador == False):
+                m[f][c].potenciaGenerada = 0
+
+
+    return m
 
 
 def rellenarPoblacionInicial(cantCromosomas):
@@ -104,6 +120,7 @@ def rellenarPoblacionInicial(cantCromosomas):
 
 
 def mostrarMolinos(matriz):
+    print("molinos")
     for fila in range(10):
         print("")
         for columna in range(10):
@@ -111,42 +128,43 @@ def mostrarMolinos(matriz):
                 print("[ X ]", end="")
             else:
                 print("[   ]", end="")
+    print()
 
 
 def mostrarPotencias(matriz):
+    print("potencias")
     for fila in range(10):
         print("")
         for columna in range(10):
-            if(matriz[fila][columna].HayGenerador):
-                n = matriz[fila][columna].potenciaGenerada
-                print("  " + "{:.2f}".format(n).ljust(6) + " ", end="")
-            else:
-                n = 0
-                print("  " + "{:.2f}".format(n).ljust(6) + " ", end="")
+            n = matriz[fila][columna].potenciaGenerada
+            print("  " + "{:.2f}".format(n).ljust(6) + " ", end="")
+    print()
 
 
 def mostrarVientos(matriz):
+    print("vientos:")
     for fila in range(10):
         print("")
         for columna in range(10):
             n = round(matriz[fila][columna].viento + 0.0, 2)
             print("  " + "{:.2f}".format(n).ljust(5) + " ", end="")
     print()
-    print("----------------------------------")
 
 
 def rellenarFuncionesObjetivoYFitness(poblacion):
     listaFObjetivo = []
     listaFitness = []
 
+    for p in poblacion:
+        p = ejecutaViento(p)
+
     # calcula listaFObjetivo
     for cromosoma in poblacion:
-        ejecutaViento(cromosoma)
         fObjetivo = 0
         for fila in cromosoma:
             for casillero in fila:
-                casillero.potenciaGenerada = casillero.generador.potenciaGenerada(casillero.viento)
-                fObjetivo += casillero.potenciaGenerada
+                if(casillero.HayGenerador):
+                    fObjetivo += casillero.potenciaGenerada
         listaFObjetivo.append(fObjetivo)
 
     # calcula el fitness
@@ -184,21 +202,15 @@ def seleccionarPareja(poblacion, listaFitness):
 
 
 def crossover(padres, prob):
-
-    # hacer que se "purgen" los cruzados
-
-    
     r = random.uniform(0, 1)
-    p1 = padres[0].copy()
-    p2 = padres[1].copy()
+    p1 = ejecutaViento(padres[0].copy())
+    p2 = ejecutaViento(padres[1].copy())
 
     hijo1 = []
     hijo2 = []
 
     if(prob <= prob):
-
         # primer hijo sale por mejores filas.
-
         for f in range(10):
             puntajeFila1 = 0
             puntajeFila2 = 0
@@ -234,11 +246,40 @@ def crossover(padres, prob):
             else:
                 for f in range(10):
                     hijo2[f][c] = p2[f][c]
+
+        # me aseguro de que no salgan del crossover con mas de 25 aerogeneradores.
+        hijo1 = purgar(hijo1)
+        hijo2 = purgar(hijo2)
+
     else:
         hijo1 = p1.copy()
         hijo2 = p2.copy()
 
     return hijo1, hijo2
+
+
+def purgar(m):
+    matriz = m.copy()
+
+    aerogeneradores = []
+    for f in range(10):
+        for c in range(10):
+            if(matriz[f][c].HayGenerador):
+                aerogeneradores.append(matriz[f][c])
+
+    # ordeno la lista por potencia generada de menor a mayor
+    aerogeneradores.sort(key=lambda x: x.potenciaGenerada, reverse=False)
+    if(len(aerogeneradores) > 25):
+        cantEliminar = len(aerogeneradores) - 25
+    else:
+        cantEliminar = 0
+
+    # elimino los peores aerogeneradores
+    for i in range(cantEliminar):
+        a = aerogeneradores[i]
+        matriz[a.fila][a.columna].HayGenerador = False
+
+    return matriz
 
 
 def mutacion(hijoOriginal, prob):
@@ -278,8 +319,8 @@ def elitismo(poblacion, listaFitness, cantElite):
 
 
 def mostrarGraficasEnPantalla(ejeX, minimos, maximos, media, minHistorico):
-    plt.plot(ejeX, minimos, label='Minimos', linewidth=4, color="red", alpha=0.6)
-    plt.plot(ejeX, maximos, label='Maximos', linewidth=4, color="blue", alpha=0.6)
+    plt.plot(ejeX, minimos, label='Minimos', linewidth=4, color="blue", alpha=0.6)
+    plt.plot(ejeX, maximos, label='Maximos', linewidth=4, color="red", alpha=0.6)
     plt.plot(ejeX, media, label='Media', linewidth=4, color="green", alpha=0.6)
     plt.plot(ejeX, minHistorico, label='Mejor Historico', linewidth=4, color="purple", alpha=0.2)
 
@@ -291,11 +332,9 @@ def mostrarGraficasEnPantalla(ejeX, minimos, maximos, media, minHistorico):
 
 def Algoritmo_Genetico(generador):
     Casillero.generador = generador
-
     # ------------------- Definiciones de variables ------------------- #
 
     # arreglos para las graficas.
-    mostrarGraficas = True  # si no se quieren mostrar graficas de rendimiento poner en false.
     ejeX = []
     minimos = []
     maximos = []
@@ -341,8 +380,8 @@ def Algoritmo_Genetico(generador):
         print("GENERACIÓN ", cantidadCiclos, " LISTA.")
 
         if(hayElitismo):
-            elites = elitismo(poblacion,listaFitness,cantElite)
-            
+            elites = elitismo(poblacion, listaFitness, cantElite)
+
             for e in elites:
                 proximaGeneracion.append(e)
 
@@ -351,21 +390,24 @@ def Algoritmo_Genetico(generador):
             # seleccionar 2 individuos para el cruce
             padres = seleccionarPareja(poblacion, listaFitness)
             # cruzar con cierta probabilidad 2 individuos y obtener descendientes
-            hijos = crossover(padres, p_crossover)
-            
+            hijo1, hijo2 = crossover(padres, p_crossover)
+
             # hacer que se "purgen" los cruzados
-            
+
             # Mutar con cierta probabilidad
-            hijomutado1 = mutacion(hijos[0], p_mutacion)
-            hijomutado2 = mutacion(hijos[1], p_mutacion)
+            hijomutado1 = mutacion(hijo1, p_mutacion)
+            hijomutado2 = mutacion(hijo2, p_mutacion)
+
             # Insertar descendientes en la proxima generacion
             proximaGeneracion.append(hijomutado1)
             proximaGeneracion.append(hijomutado2)
 
         poblacion = proximaGeneracion.copy()
+
         proximaGeneracion = []
         listaFObjetivo = []
         listaFitness = []
+
         # rellena funcion fitness y objetivo.
         listaFitness, listaFObjetivo = rellenarFuncionesObjetivoYFitness(poblacion)
 
@@ -385,6 +427,34 @@ def Algoritmo_Genetico(generador):
 
         if(cantidadCiclos == cantMaximaGeneraciones):
             terminado = True
+
+    print(" ---------------------------------- ")
+    print("Este es el supuesto mejor cromosoma de todos:")
+
+    mejorCromosoma = ejecutaViento(mejorCromosoma)
+
+    mostrarMolinos(mejorCromosoma)
+    mostrarVientos(mejorCromosoma)
+    mostrarPotencias(mejorCromosoma)
+
+    # le cuento el puntaje a manopla
+    p = 0
+    for f in range(10):
+        for c in range(10):
+            p+= mejorCromosoma[f][c].potenciaGenerada
+
+    print("EL PUNTAJE DE ESTE ES : " + str(mejorPuntaje))
+    print("PERO CALCULADO A MANO ES: " + str(p))
+
+    print("Este es el mejor de la ultima GENERACION")
+
+    ultimo = poblacion[indice_maximo]
+    ultimo = ejecutaViento(ultimo)
+
+    mostrarMolinos(ultimo)
+    mostrarVientos(ultimo)
+    mostrarPotencias(ultimo)
+    print("EL PUNTAJE DE ESTE ES : " + str(maximoActual))
 
     # plotea las graficas.
     mostrarGraficasEnPantalla(ejeX, minimos, maximos, medias, mejorHistorico)
