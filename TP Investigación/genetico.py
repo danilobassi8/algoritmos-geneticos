@@ -5,6 +5,8 @@ import casillero as game
 import math
 import random
 import genetico
+import statistics
+import matplotlib.pyplot as plt
 
 
 class Casillero():
@@ -111,6 +113,18 @@ def mostrarMolinos(matriz):
                 print("[   ]", end="")
 
 
+def mostrarPotencias(matriz):
+    for fila in range(10):
+        print("")
+        for columna in range(10):
+            if(matriz[fila][columna].HayGenerador):
+                n = matriz[fila][columna].potenciaGenerada
+                print("  " + "{:.2f}".format(n).ljust(6) + " ", end="")
+            else:
+                n = 0
+                print("  " + "{:.2f}".format(n).ljust(6) + " ", end="")
+
+
 def mostrarVientos(matriz):
     for fila in range(10):
         print("")
@@ -170,14 +184,67 @@ def seleccionarPareja(poblacion, listaFitness):
 
 
 def crossover(padres, prob):
-    print("asd")
+
+    # hacer que se "purgen" los cruzados
+
+    
+    r = random.uniform(0, 1)
+    p1 = padres[0].copy()
+    p2 = padres[1].copy()
+
+    hijo1 = []
+    hijo2 = []
+
+    if(prob <= prob):
+
+        # primer hijo sale por mejores filas.
+
+        for f in range(10):
+            puntajeFila1 = 0
+            puntajeFila2 = 0
+            for c in range(10):
+                if(p1[f][c].HayGenerador):
+                    puntajeFila1 += p1[f][c].potenciaGenerada
+                if(p2[f][c].HayGenerador):
+                    puntajeFila2 += p2[f][c].potenciaGenerada
+            if(puntajeFila1 >= puntajeFila2):
+                hijo1.append(p1[f])
+            else:
+                hijo1.append(p2[f])
+
+        # segundo hijo sale por mejores columnas
+
+        for i in range(10):
+            renglon = []
+            for j in range(10):
+                renglon.append(-1)
+            hijo2.append(renglon)
+
+        for c in range(10):
+            puntajeColumna1 = 0
+            puntajeColumna2 = 0
+            for f in range(10):
+                if(p1[f][c].HayGenerador):
+                    puntajeColumna1 += p1[f][c].potenciaGenerada
+                if(p2[f][c].HayGenerador):
+                    puntajeColumna2 += p2[f][c].potenciaGenerada
+            if (puntajeColumna1 >= puntajeColumna2):
+                for f in range(10):
+                    hijo2[f][c] = p1[f][c]
+            else:
+                for f in range(10):
+                    hijo2[f][c] = p2[f][c]
+    else:
+        hijo1 = p1.copy()
+        hijo2 = p2.copy()
+
+    return hijo1, hijo2
 
 
 def mutacion(hijoOriginal, prob):
     # hacemos una copia para que no ocurran problemas de referencias de Python
     hijo = hijoOriginal.copy()
     r = random.uniform(0, 1)
-    mostrarMolinos(hijo)
 
     # Inversion mutation con toda una fila elegida al azar.
     if(r <= prob):
@@ -210,10 +277,31 @@ def elitismo(poblacion, listaFitness, cantElite):
     return elites
 
 
+def mostrarGraficasEnPantalla(ejeX, minimos, maximos, media, minHistorico):
+    plt.plot(ejeX, minimos, label='Minimos', linewidth=4, color="red", alpha=0.6)
+    plt.plot(ejeX, maximos, label='Maximos', linewidth=4, color="blue", alpha=0.6)
+    plt.plot(ejeX, media, label='Media', linewidth=4, color="green", alpha=0.6)
+    plt.plot(ejeX, minHistorico, label='Mejor Historico', linewidth=4, color="purple", alpha=0.2)
+
+    plt.legend()
+    plt.ylabel(' Valor de la Funcion Objetivo ')
+    plt.xlabel(' Generación ')
+    plt.show()
+
+
 def Algoritmo_Genetico(generador):
     Casillero.generador = generador
 
     # ------------------- Definiciones de variables ------------------- #
+
+    # arreglos para las graficas.
+    mostrarGraficas = True  # si no se quieren mostrar graficas de rendimiento poner en false.
+    ejeX = []
+    minimos = []
+    maximos = []
+    medias = []
+    mejorHistorico = []
+
     # Poblacion
     poblacion = []
     proximaGeneracion = []
@@ -223,11 +311,15 @@ def Algoritmo_Genetico(generador):
     listaFitness = []
 
     # Parametros.
-    cantMaximaGeneraciones = 100
+    cantMaximaGeneraciones = 200
     # probabilidades
     p_crossover = 0.9
     p_mutacion = 0.05
-    cantIndividuosEnPoblacion = 10
+    cantIndividuosEnPoblacion = 50
+
+    # mejores temporales
+    mejorCromosoma = 0
+    mejorPuntaje = 0
 
     # ------------------- Comienzo del programa ------------------- #
 
@@ -240,7 +332,7 @@ def Algoritmo_Genetico(generador):
         cantElite = 0
 
     poblacion = rellenarPoblacionInicial(cantIndividuosEnPoblacion)
-    listaFObjetivo, listaFitness = rellenarFuncionesObjetivoYFitness(poblacion)
+    listaFitness, listaFObjetivo = rellenarFuncionesObjetivoYFitness(poblacion)
 
     cantidadCiclos = 0
     terminado = False
@@ -248,22 +340,52 @@ def Algoritmo_Genetico(generador):
         cantidadCiclos = cantidadCiclos + 1
         print("GENERACIÓN ", cantidadCiclos, " LISTA.")
 
-        # if(hayElitismo):
-        # elitismo()
+        if(hayElitismo):
+            elites = elitismo(poblacion,listaFitness,cantElite)
+            
+            for e in elites:
+                proximaGeneracion.append(e)
 
         for i in range(int((len(poblacion) - cantElite) / 2)):
 
             # seleccionar 2 individuos para el cruce
             padres = seleccionarPareja(poblacion, listaFitness)
             # cruzar con cierta probabilidad 2 individuos y obtener descendientes
-            # hijos = crossover(padres)
+            hijos = crossover(padres, p_crossover)
+            
+            # hacer que se "purgen" los cruzados
+            
             # Mutar con cierta probabilidad
-
-            # borrar cuando se haga el crossover
-            hijos = padres
-
             hijomutado1 = mutacion(hijos[0], p_mutacion)
             hijomutado2 = mutacion(hijos[1], p_mutacion)
             # Insertar descendientes en la proxima generacion
-            # proximaGeneracion.append(hijomutado1)
-            # proximaGeneracion.append(hijomutado2)
+            proximaGeneracion.append(hijomutado1)
+            proximaGeneracion.append(hijomutado2)
+
+        poblacion = proximaGeneracion.copy()
+        proximaGeneracion = []
+        listaFObjetivo = []
+        listaFitness = []
+        # rellena funcion fitness y objetivo.
+        listaFitness, listaFObjetivo = rellenarFuncionesObjetivoYFitness(poblacion)
+
+        # Guarda el mejor cromosoma
+        maximoActual = max(listaFObjetivo)
+        indice_maximo = listaFObjetivo.index(maximoActual)
+        if (mejorPuntaje < maximoActual):
+            mejorCromosoma = poblacion[indice_maximo]
+            mejorPuntaje = maximoActual
+
+        # GRAFICOS
+        ejeX.append(cantidadCiclos)
+        minimos.append(min(listaFObjetivo))
+        maximos.append(max(listaFObjetivo))
+        medias.append(statistics.mean(listaFObjetivo))
+        mejorHistorico.append(mejorPuntaje)
+
+        if(cantidadCiclos == cantMaximaGeneraciones):
+            terminado = True
+
+    # plotea las graficas.
+    mostrarGraficasEnPantalla(ejeX, minimos, maximos, medias, mejorHistorico)
+    return mejorCromosoma

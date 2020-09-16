@@ -6,6 +6,7 @@ import math
 import random
 import genetico
 
+
 os.system("cls")
 
 
@@ -52,4 +53,5 @@ def mostrarMolinos(matriz):
 generador = modelos.ObtenerGenerador()
 Casillero.generador = generador
 
-genetico.Algoritmo_Genetico(generador)
+mejorCromosoma =  genetico.Algoritmo_Genetico(generador)
+
