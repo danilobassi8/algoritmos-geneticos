@@ -7,6 +7,7 @@ import random
 import genetico
 import statistics
 import matplotlib.pyplot as plt
+import copy
 
 
 class Casillero():
@@ -77,7 +78,7 @@ def ejecutaViento(cromosoma):
 
             # si ya le asigne el viento, no hago nada
             # recorro los renglones de a una columna a la vez para ver como avanza el viento cada vez que se encuentra con una columna.
-    
+
     # una vez terminado, vuelvo a poner vientoAsignado en false.
     for f in range(10):
         for c in range(10):
@@ -85,7 +86,6 @@ def ejecutaViento(cromosoma):
             # me aseguro de que si no tiene generador, no genera nada.
             if(m[f][c].HayGenerador == False):
                 m[f][c].potenciaGenerada = 0
-
 
     return m
 
@@ -155,11 +155,10 @@ def rellenarFuncionesObjetivoYFitness(poblacion):
     listaFObjetivo = []
     listaFitness = []
 
-    for p in poblacion:
-        p = ejecutaViento(p)
-
     # calcula listaFObjetivo
     for cromosoma in poblacion:
+        cromosoma = ejecutaViento(cromosoma)
+
         fObjetivo = 0
         for fila in cromosoma:
             for casillero in fila:
@@ -196,15 +195,15 @@ def seleccionarPareja(poblacion, listaFitness):
                 if(ruleta[i - 1] <= r <= ruleta[i]):
                     indice = i
                     break
-        pareja.append(poblacion[indice])
+        pareja.append(copy.deepcopy(poblacion[indice]))
 
     return pareja
 
 
 def crossover(padres, prob):
     r = random.uniform(0, 1)
-    p1 = ejecutaViento(padres[0].copy())
-    p2 = ejecutaViento(padres[1].copy())
+    p1 = ejecutaViento(copy.deepcopy(padres[0]))
+    p2 = ejecutaViento(copy.deepcopy(padres[1]))
 
     hijo1 = []
     hijo2 = []
@@ -252,14 +251,14 @@ def crossover(padres, prob):
         hijo2 = purgar(hijo2)
 
     else:
-        hijo1 = p1.copy()
-        hijo2 = p2.copy()
+        hijo1 = copy.deepcopy(p1.copy)
+        hijo2 = copy.deepcopy(p2.copy)
 
     return hijo1, hijo2
 
 
 def purgar(m):
-    matriz = m.copy()
+    matriz = copy.deepcopy(m)
 
     aerogeneradores = []
     for f in range(10):
@@ -284,7 +283,7 @@ def purgar(m):
 
 def mutacion(hijoOriginal, prob):
     # hacemos una copia para que no ocurran problemas de referencias de Python
-    hijo = hijoOriginal.copy()
+    hijo = copy.deepcopy(hijoOriginal)
     r = random.uniform(0, 1)
 
     # Inversion mutation con toda una fila elegida al azar.
@@ -304,7 +303,7 @@ def elitismo(poblacion, listaFitness, cantElite):
     # y volvemos a elegir el mejor. Luego sacamos los indices en el arreglo original.
     # y agregamos en la proximaGeneracion la poblacion en el indice de los mejores.
     indiceMejor = []
-    copiaFitness = listaFitness.copy()
+    copiaFitness = copy.deepcopy(listaFitness)
     elites = []
 
     for i in range(cantElite):
@@ -365,7 +364,7 @@ def Algoritmo_Genetico(generador):
     hayElitismo = input("¿Aplicar elitismo? (s/n): ")
     if(hayElitismo.lower() == 's'):
         hayElitismo = True
-        cantElite = 2
+        cantElite = 4
     else:
         hayElitismo = False
         cantElite = 0
@@ -377,13 +376,13 @@ def Algoritmo_Genetico(generador):
     terminado = False
     while (terminado == False):
         cantidadCiclos = cantidadCiclos + 1
-        print("GENERACIÓN ", cantidadCiclos, " LISTA.")
+        print("GENERACIÓN ", cantidadCiclos, " LISTA. <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
         if(hayElitismo):
             elites = elitismo(poblacion, listaFitness, cantElite)
 
             for e in elites:
-                proximaGeneracion.append(e)
+                proximaGeneracion.append(copy.deepcopy(e))
 
         for i in range(int((len(poblacion) - cantElite) / 2)):
 
@@ -392,17 +391,17 @@ def Algoritmo_Genetico(generador):
             # cruzar con cierta probabilidad 2 individuos y obtener descendientes
             hijo1, hijo2 = crossover(padres, p_crossover)
 
-            # hacer que se "purgen" los cruzados
-
             # Mutar con cierta probabilidad
             hijomutado1 = mutacion(hijo1, p_mutacion)
             hijomutado2 = mutacion(hijo2, p_mutacion)
 
+            hijomutado1 = ejecutaViento(hijomutado1)
+            hijomutado2 = ejecutaViento(hijomutado2)
             # Insertar descendientes en la proxima generacion
             proximaGeneracion.append(hijomutado1)
             proximaGeneracion.append(hijomutado2)
 
-        poblacion = proximaGeneracion.copy()
+        poblacion = copy.deepcopy(proximaGeneracion)
 
         proximaGeneracion = []
         listaFObjetivo = []
@@ -411,12 +410,11 @@ def Algoritmo_Genetico(generador):
         # rellena funcion fitness y objetivo.
         listaFitness, listaFObjetivo = rellenarFuncionesObjetivoYFitness(poblacion)
 
-        # Guarda el mejor cromosoma
-        maximoActual = max(listaFObjetivo)
-        indice_maximo = listaFObjetivo.index(maximoActual)
-        if (mejorPuntaje < maximoActual):
-            mejorCromosoma = poblacion[indice_maximo]
-            mejorPuntaje = maximoActual
+        indiceMaximo = listaFObjetivo.index(max(listaFObjetivo))
+        cromo_maximo_actual = poblacion[indiceMaximo]
+        if(mejorPuntaje <= max(listaFObjetivo)):
+            mejorPuntaje = max(listaFObjetivo)
+            mejorCromosoma = copy.deepcopy(cromo_maximo_actual)
 
         # GRAFICOS
         ejeX.append(cantidadCiclos)
@@ -441,20 +439,20 @@ def Algoritmo_Genetico(generador):
     p = 0
     for f in range(10):
         for c in range(10):
-            p+= mejorCromosoma[f][c].potenciaGenerada
+            p += mejorCromosoma[f][c].potenciaGenerada
 
     print("EL PUNTAJE DE ESTE ES : " + str(mejorPuntaje))
     print("PERO CALCULADO A MANO ES: " + str(p))
 
     print("Este es el mejor de la ultima GENERACION")
 
-    ultimo = poblacion[indice_maximo]
+    ultimo = poblacion[indiceMaximo]
     ultimo = ejecutaViento(ultimo)
 
     mostrarMolinos(ultimo)
     mostrarVientos(ultimo)
     mostrarPotencias(ultimo)
-    print("EL PUNTAJE DE ESTE ES : " + str(maximoActual))
+    print("EL PUNTAJE DE ESTE ES : " + str(max(listaFObjetivo)))
 
     # plotea las graficas.
     mostrarGraficasEnPantalla(ejeX, minimos, maximos, medias, mejorHistorico)
