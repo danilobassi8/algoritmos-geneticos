@@ -202,8 +202,9 @@ def seleccionarPareja(poblacion, listaFitness):
 
 def crossover(padres, prob):
     r = random.uniform(0, 1)
-    p1 = ejecutaViento(copy.deepcopy(padres[0]))
-    p2 = ejecutaViento(copy.deepcopy(padres[1]))
+
+    p1 = padres[0]
+    p2 = padres[1]
 
     hijo1 = []
     hijo2 = []
@@ -251,14 +252,14 @@ def crossover(padres, prob):
         hijo2 = purgar(hijo2)
 
     else:
-        hijo1 = copy.deepcopy(p1.copy)
-        hijo2 = copy.deepcopy(p2.copy)
+        hijo1 = p1
+        hijo2 = p2
 
     return hijo1, hijo2
 
 
 def purgar(m):
-    matriz = copy.deepcopy(m)
+    matriz = m
 
     aerogeneradores = []
     for f in range(10):
@@ -283,9 +284,9 @@ def purgar(m):
 
 def mutacion(hijoOriginal, prob):
     # hacemos una copia para que no ocurran problemas de referencias de Python
-    hijo = copy.deepcopy(hijoOriginal)
-    r = random.uniform(0, 1)
+    hijo = hijoOriginal.copy()
 
+    r = random.uniform(0, 1)
     # Inversion mutation con toda una fila elegida al azar.
     if(r <= prob):
         numero = int(random.uniform(0, len(hijo)))
@@ -303,7 +304,7 @@ def elitismo(poblacion, listaFitness, cantElite):
     # y volvemos a elegir el mejor. Luego sacamos los indices en el arreglo original.
     # y agregamos en la proximaGeneracion la poblacion en el indice de los mejores.
     indiceMejor = []
-    copiaFitness = copy.deepcopy(listaFitness)
+    copiaFitness = listaFitness.copy()
     elites = []
 
     for i in range(cantElite):
@@ -349,7 +350,7 @@ def Algoritmo_Genetico(generador):
     listaFitness = []
 
     # Parametros.
-    cantMaximaGeneraciones = 200
+    cantMaximaGeneraciones = 50
     # probabilidades
     p_crossover = 0.9
     p_mutacion = 0.05
@@ -376,13 +377,13 @@ def Algoritmo_Genetico(generador):
     terminado = False
     while (terminado == False):
         cantidadCiclos = cantidadCiclos + 1
-        print("GENERACIÓN ", cantidadCiclos, " LISTA. <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        print("GENERACIÓN ", cantidadCiclos, " LISTA.")
 
         if(hayElitismo):
             elites = elitismo(poblacion, listaFitness, cantElite)
 
             for e in elites:
-                proximaGeneracion.append(copy.deepcopy(e))
+                proximaGeneracion.append(e)
 
         for i in range(int((len(poblacion) - cantElite) / 2)):
 
@@ -395,13 +396,11 @@ def Algoritmo_Genetico(generador):
             hijomutado1 = mutacion(hijo1, p_mutacion)
             hijomutado2 = mutacion(hijo2, p_mutacion)
 
-            hijomutado1 = ejecutaViento(hijomutado1)
-            hijomutado2 = ejecutaViento(hijomutado2)
             # Insertar descendientes en la proxima generacion
             proximaGeneracion.append(hijomutado1)
             proximaGeneracion.append(hijomutado2)
 
-        poblacion = copy.deepcopy(proximaGeneracion)
+        poblacion = (proximaGeneracion).copy()
 
         proximaGeneracion = []
         listaFObjetivo = []
@@ -414,7 +413,7 @@ def Algoritmo_Genetico(generador):
         cromo_maximo_actual = poblacion[indiceMaximo]
         if(mejorPuntaje <= max(listaFObjetivo)):
             mejorPuntaje = max(listaFObjetivo)
-            mejorCromosoma = copy.deepcopy(cromo_maximo_actual)
+            mejorCromosoma = cromo_maximo_actual.copy()
 
         # GRAFICOS
         ejeX.append(cantidadCiclos)
