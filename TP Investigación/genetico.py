@@ -4,7 +4,6 @@ import parametros as params
 import casillero as game
 import math
 import random
-import genetico
 import statistics
 import matplotlib.pyplot as plt
 import copy
@@ -333,7 +332,13 @@ def mostrarGraficasEnPantalla(ejeX, minimos, maximos, media, minHistorico):
     plt.legend()
     plt.ylabel(' Valor de la Funcion Objetivo ')
     plt.xlabel(' Generación ')
+
+    # para que se muestre y no interrumpa el resto del programa
+    plt.ion()
     plt.show()
+    plt.draw()
+    plt.pause(0.001)
+
 
 
 def Algoritmo_Genetico(generador):
@@ -356,10 +361,10 @@ def Algoritmo_Genetico(generador):
     listaFitness = []
 
     # Parametros.
-    cantMaximaGeneraciones = 200
+    cantMaximaGeneraciones = 2
     # probabilidades
     p_crossover = 0.9
-    p_mutacion = 0.1
+    p_mutacion = 0.2
     cantIndividuosEnPoblacion = 50
 
     # mejores temporales
@@ -443,6 +448,7 @@ def Algoritmo_Genetico(generador):
     print("Potencia total generada: " + str(mejorPuntaje))
     print("-------------------------------------")
 
-    # plotea las graficas.
+    # plotea las graficas
     mostrarGraficasEnPantalla(ejeX, minimos, maximos, medias, mejorHistorico)
+    
     return mejorCromosoma

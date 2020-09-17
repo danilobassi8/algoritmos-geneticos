@@ -1,6 +1,7 @@
 import os
 import dbase as modelos
 import parametros as params
+import matplotlib.pyplot as plt
 import casillero as game
 import math
 import random
@@ -18,3 +19,4 @@ generador = modelos.ObtenerGenerador()
 mejorCromosoma =  genetico.Algoritmo_Genetico(generador)
 # lo muestro en pantalla.
 game.MostrarPantallaConMolinos(mejorCromosoma)
+
