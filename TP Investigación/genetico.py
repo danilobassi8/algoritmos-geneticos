@@ -8,6 +8,7 @@ import genetico
 import statistics
 import matplotlib.pyplot as plt
 import copy
+from tqdm import tqdm
 
 
 class Casillero():
@@ -254,13 +255,10 @@ def crossover(padres, prob):
         hijo1 = p1
         hijo2 = p2
 
-    return hijo1,hijo2
+    return hijo1, hijo2
 
 
 def purgar(m):
-
-    original = m
-
     matriz = m
     aerogeneradores = []
     for f in range(10):
@@ -358,7 +356,7 @@ def Algoritmo_Genetico(generador):
     listaFitness = []
 
     # Parametros.
-    cantMaximaGeneraciones = 100
+    cantMaximaGeneraciones = 200
     # probabilidades
     p_crossover = 0.9
     p_mutacion = 0.1
@@ -377,62 +375,63 @@ def Algoritmo_Genetico(generador):
     else:
         hayElitismo = False
         cantElite = 0
+    print()
 
     poblacion = rellenarPoblacionInicial(cantIndividuosEnPoblacion)
     listaFitness, listaFObjetivo = rellenarFuncionesObjetivoYFitness(poblacion)
 
     cantidadCiclos = 0
-    terminado = False
-    while (terminado == False):
-        cantidadCiclos = cantidadCiclos + 1
-        print("GENERACIÓN ", cantidadCiclos, " LISTA.")
 
-        if(hayElitismo):
-            elites = elitismo(poblacion, listaFitness, cantElite)
+    # esta linea es para que se muestre una barra de carga con ciertas opciones
+    with tqdm(total=cantMaximaGeneraciones, ncols=60,
+              bar_format="{desc}: >{percentage:.0f}%|{bar}| Generación: {n_fmt}/{total_fmt}") as barra:
 
-            for e in elites:
-                proximaGeneracion.append(e)
+        for cantidadCiclos in range(cantMaximaGeneraciones):
+            barra.update()
 
-        for i in range(int((len(poblacion) - cantElite) / 2)):
+            if(hayElitismo):
+                elites = elitismo(poblacion, listaFitness, cantElite)
 
-            # seleccionar 2 individuos para el cruce
-            padres = seleccionarPareja(poblacion, listaFitness)
+                for e in elites:
+                    proximaGeneracion.append(e)
 
-            # cruzar con cierta probabilidad 2 individuos y obtener descendientes
-            hijo1, hijo2 = crossover(padres, p_crossover)
+            for i in range(int((len(poblacion) - cantElite) / 2)):
 
-            # Mutar con cierta probabilidad
-            hijomutado1 = mutacion(hijo1, p_mutacion)
-            hijomutado2 = mutacion(hijo2, p_mutacion)
+                # seleccionar 2 individuos para el cruce
+                padres = seleccionarPareja(poblacion, listaFitness)
 
-            # Insertar descendientes en la proxima generacion
-            proximaGeneracion.append(hijomutado1)
-            proximaGeneracion.append(hijomutado2)
+                # cruzar con cierta probabilidad 2 individuos y obtener descendientes
+                hijo1, hijo2 = crossover(padres, p_crossover)
 
-        poblacion = (proximaGeneracion).copy()
+                # Mutar con cierta probabilidad
+                hijomutado1 = mutacion(hijo1, p_mutacion)
+                hijomutado2 = mutacion(hijo2, p_mutacion)
 
-        proximaGeneracion = []
-        listaFObjetivo = []
-        listaFitness = []
+                # Insertar descendientes en la proxima generacion
+                proximaGeneracion.append(hijomutado1)
+                proximaGeneracion.append(hijomutado2)
 
-        # rellena funcion fitness y objetivo.
-        listaFitness, listaFObjetivo = rellenarFuncionesObjetivoYFitness(poblacion)
+            poblacion = (proximaGeneracion).copy()
 
-        indiceMaximo = listaFObjetivo.index(max(listaFObjetivo))
-        cromo_maximo_actual = poblacion[indiceMaximo]
-        if(mejorPuntaje <= max(listaFObjetivo)):
-            mejorPuntaje = max(listaFObjetivo)
-            mejorCromosoma = cromo_maximo_actual.copy()
+            proximaGeneracion = []
+            listaFObjetivo = []
+            listaFitness = []
 
-        # GRAFICOS
-        ejeX.append(cantidadCiclos)
-        minimos.append(min(listaFObjetivo))
-        maximos.append(max(listaFObjetivo))
-        medias.append(statistics.mean(listaFObjetivo))
-        mejorHistorico.append(mejorPuntaje)
+            # rellena funcion fitness y objetivo.
+            listaFitness, listaFObjetivo = rellenarFuncionesObjetivoYFitness(poblacion)
 
-        if(cantidadCiclos == cantMaximaGeneraciones):
-            terminado = True
+            indiceMaximo = listaFObjetivo.index(max(listaFObjetivo))
+            cromo_maximo_actual = poblacion[indiceMaximo]
+            if(mejorPuntaje <= max(listaFObjetivo)):
+                mejorPuntaje = max(listaFObjetivo)
+                mejorCromosoma = cromo_maximo_actual.copy()
+
+            # GRAFICOS
+            ejeX.append(cantidadCiclos)
+            minimos.append(min(listaFObjetivo))
+            maximos.append(max(listaFObjetivo))
+            medias.append(statistics.mean(listaFObjetivo))
+            mejorHistorico.append(mejorPuntaje)
 
     # una vez terminado el algoritmo genetico
     os.system("cls")
