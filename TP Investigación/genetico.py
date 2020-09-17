@@ -195,6 +195,7 @@ def seleccionarPareja(poblacion, listaFitness):
                 if(ruleta[i - 1] <= r <= ruleta[i]):
                     indice = i
                     break
+
         pareja.append(copy.deepcopy(poblacion[indice]))
 
     return pareja
@@ -225,7 +226,6 @@ def crossover(padres, prob):
                 hijo1.append(p2[f])
 
         # segundo hijo sale por mejores columnas
-
         for i in range(10):
             renglon = []
             for j in range(10):
@@ -240,6 +240,7 @@ def crossover(padres, prob):
                     puntajeColumna1 += p1[f][c].potenciaGenerada
                 if(p2[f][c].HayGenerador):
                     puntajeColumna2 += p2[f][c].potenciaGenerada
+
             if (puntajeColumna1 >= puntajeColumna2):
                 for f in range(10):
                     hijo2[f][c] = p1[f][c]
@@ -247,39 +248,46 @@ def crossover(padres, prob):
                 for f in range(10):
                     hijo2[f][c] = p2[f][c]
 
-        # me aseguro de que no salgan del crossover con mas de 25 aerogeneradores.
         hijo1 = purgar(hijo1)
         hijo2 = purgar(hijo2)
-
     else:
         hijo1 = p1
         hijo2 = p2
 
-    return hijo1, hijo2
+    return hijo1,hijo2
 
 
 def purgar(m):
-    matriz = m
 
+    original = m
+
+    matriz = m
     aerogeneradores = []
     for f in range(10):
         for c in range(10):
             if(matriz[f][c].HayGenerador):
                 aerogeneradores.append(matriz[f][c])
 
-    # ordeno la lista por potencia generada de menor a mayor
+    # ordeno la lista por potencia generada de menor a mayor y me quedo solo con los 25 mejores
     aerogeneradores.sort(key=lambda x: x.potenciaGenerada, reverse=False)
-    if(len(aerogeneradores) > 25):
-        cantEliminar = len(aerogeneradores) - 25
-    else:
-        cantEliminar = 0
-
-    # elimino los peores aerogeneradores
-    for i in range(cantEliminar):
-        a = aerogeneradores[i]
+    while(len(aerogeneradores) > 25):
+        a = aerogeneradores[0]
         matriz[a.fila][a.columna].HayGenerador = False
+        aerogeneradores.remove(aerogeneradores[0])
 
-    return matriz
+    # creo una copia del cromosoma con esos 25 mejores.
+    cromo = []
+    for f in range(10):
+        renglon = []
+        for c in range(10):
+            renglon.append(Casillero(f, c))
+        cromo.append(renglon)
+
+    for a in aerogeneradores:
+        cromo[a.fila][a.columna].HayGenerador = True
+    cromo = ejecutaViento(cromo)
+
+    return cromo
 
 
 def mutacion(hijoOriginal, prob):
@@ -350,10 +358,10 @@ def Algoritmo_Genetico(generador):
     listaFitness = []
 
     # Parametros.
-    cantMaximaGeneraciones = 50
+    cantMaximaGeneraciones = 100
     # probabilidades
     p_crossover = 0.9
-    p_mutacion = 0.05
+    p_mutacion = 0.1
     cantIndividuosEnPoblacion = 50
 
     # mejores temporales
@@ -365,7 +373,7 @@ def Algoritmo_Genetico(generador):
     hayElitismo = input("¿Aplicar elitismo? (s/n): ")
     if(hayElitismo.lower() == 's'):
         hayElitismo = True
-        cantElite = 4
+        cantElite = 2
     else:
         hayElitismo = False
         cantElite = 0
@@ -389,6 +397,7 @@ def Algoritmo_Genetico(generador):
 
             # seleccionar 2 individuos para el cruce
             padres = seleccionarPareja(poblacion, listaFitness)
+
             # cruzar con cierta probabilidad 2 individuos y obtener descendientes
             hijo1, hijo2 = crossover(padres, p_crossover)
 
@@ -425,33 +434,15 @@ def Algoritmo_Genetico(generador):
         if(cantidadCiclos == cantMaximaGeneraciones):
             terminado = True
 
-    print(" ---------------------------------- ")
-    print("Este es el supuesto mejor cromosoma de todos:")
-
-    mejorCromosoma = ejecutaViento(mejorCromosoma)
+    # una vez terminado el algoritmo genetico
+    os.system("cls")
+    print("-------------------------------------")
 
     mostrarMolinos(mejorCromosoma)
     mostrarVientos(mejorCromosoma)
-    mostrarPotencias(mejorCromosoma)
 
-    # le cuento el puntaje a manopla
-    p = 0
-    for f in range(10):
-        for c in range(10):
-            p += mejorCromosoma[f][c].potenciaGenerada
-
-    print("EL PUNTAJE DE ESTE ES : " + str(mejorPuntaje))
-    print("PERO CALCULADO A MANO ES: " + str(p))
-
-    print("Este es el mejor de la ultima GENERACION")
-
-    ultimo = poblacion[indiceMaximo]
-    ultimo = ejecutaViento(ultimo)
-
-    mostrarMolinos(ultimo)
-    mostrarVientos(ultimo)
-    mostrarPotencias(ultimo)
-    print("EL PUNTAJE DE ESTE ES : " + str(max(listaFObjetivo)))
+    print("Potencia total generada: " + str(mejorPuntaje))
+    print("-------------------------------------")
 
     # plotea las graficas.
     mostrarGraficasEnPantalla(ejeX, minimos, maximos, medias, mejorHistorico)

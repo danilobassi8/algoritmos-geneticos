@@ -12,8 +12,6 @@ def MostrarPantallaConMolinos(matriz):
     clock = pygame.time.Clock()
     FPS = 20
 
-    
-    
     terminado = False
     while terminado == False:
         # eventos de sistema.
