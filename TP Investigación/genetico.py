@@ -333,12 +333,10 @@ def mostrarGraficasEnPantalla(ejeX, minimos, maximos, media, minHistorico):
     plt.ylabel(' Valor de la Funcion Objetivo ')
     plt.xlabel(' Generación ')
 
-    # para que se muestre y no interrumpa el resto del programa
-    plt.ion()
+    # guarda la foto y la muestra
+    directorio = os.path.dirname(os.path.abspath("main.py"))
+    plt.savefig(directorio + '/img/ultimaCorrida.png')
     plt.show()
-    plt.draw()
-    plt.pause(0.001)
-
 
 
 def Algoritmo_Genetico(generador):
@@ -450,5 +448,5 @@ def Algoritmo_Genetico(generador):
 
     # plotea las graficas
     mostrarGraficasEnPantalla(ejeX, minimos, maximos, medias, mejorHistorico)
-    
+
     return mejorCromosoma
