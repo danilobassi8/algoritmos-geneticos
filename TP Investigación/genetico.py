@@ -361,7 +361,7 @@ def Algoritmo_Genetico(generador):
     listaFitness = []
 
     # Parametros.
-    cantMaximaGeneraciones = 2
+    cantMaximaGeneraciones = 200
     # probabilidades
     p_crossover = 0.9
     p_mutacion = 0.2
