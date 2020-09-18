@@ -6,7 +6,7 @@ import math
 import random
 import statistics
 import matplotlib.pyplot as plt
-import copy
+from copy import copy
 from tqdm import tqdm
 
 
@@ -196,7 +196,18 @@ def seleccionarPareja(poblacion, listaFitness):
                     indice = i
                     break
 
-        pareja.append(copy.deepcopy(poblacion[indice]))
+        # creo un cromosoma nuevo que es la copia de la poblacion[indice]
+        cromoNuevo = []
+        for f in range(10):
+            renglon = []
+            for c in range(10):
+                casillero = copy(poblacion[indice][f][c])
+                renglon.append(casillero)
+            cromoNuevo.append(renglon)
+        # lo agrego a la pareja a devolver.
+        pareja.append(cromoNuevo)
+        
+
 
     return pareja
 

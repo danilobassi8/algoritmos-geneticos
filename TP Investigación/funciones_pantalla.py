@@ -11,7 +11,7 @@ import math
 # -------------- Traigo desde el script principal algunos parametros. ---------
 long_estela = 94 * parametros.casilleros_estela
 viento_maximo = parametros.vel_viento
-param_dibujarMapaRugosidad = False
+param_dibujarMapaRugosidad = True
 
 flags = DOUBLEBUF
 tamaño_x = 800
