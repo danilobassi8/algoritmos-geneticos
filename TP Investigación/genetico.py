@@ -206,8 +206,6 @@ def seleccionarPareja(poblacion, listaFitness):
             cromoNuevo.append(renglon)
         # lo agrego a la pareja a devolver.
         pareja.append(cromoNuevo)
-        
-
 
     return pareja
 
@@ -298,20 +296,37 @@ def purgar(m):
     return cromo
 
 
-def mutacion(hijoOriginal, prob):
-    # hacemos una copia para que no ocurran problemas de referencias de Python
-    hijo = hijoOriginal.copy()
-
-    r = random.uniform(0, 1)
+def mutacion(hijo, prob):
     # Inversion mutation con toda una fila elegida al azar.
-    if(r <= prob):
-        numero = int(random.uniform(0, len(hijo)))
+    r = random.uniform(0, 1)
+    if(r <= 1):
+        # saco el numero de la fila
+        numero = round(random.uniform(0, 9))
         fila = hijo[numero]
-        for i in range(int(len(fila) / 2)):
-            aux = fila[len(fila) - i - 1]
-            fila[len(fila) - i - 1] = fila[i]
-            fila[i] = aux
 
+        # genero dos posiciones aleatorias
+        pos1 = round(random.uniform(0, 9))
+        pos2 = round(random.uniform(0, 9))
+        # determino cual es el maximo y cual el minimo
+        pos1, pos2 = min([pos1, pos2]), max([pos1, pos2])
+        pos2c = pos2
+
+        # creo una nueva fila vacia de diez lugares
+        filaNueva = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        # hasta pos1 son copio la fila original en la fila vacia
+        for i in range(pos1):
+            filaNueva[i] = fila[i]
+        # desde pos1 a pos2 son intercambio
+        while (pos1 <= pos2):
+            filaNueva[pos1] = fila[pos2]
+            filaNueva[pos2] = fila[pos1]
+            pos1 += 1
+            pos2 -= 1
+        # desde pos2 al final copio la fila original
+        for i in range(1,10-pos2c):
+            filaNueva[pos2c + i] = fila[pos2c + i]
+        # cambio la fila por la filanueva
+        hijo[numero] = filaNueva
     return hijo
 
 
