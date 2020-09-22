@@ -1,6 +1,6 @@
 # ----------------------        parametros importantes         ---------------------- #
 
-vel_viento = 20
+vel_viento = 13
 casilleros_estela = 5
 
 # el coeficiente de arrastre va a ser calculado para cada modelo en particular porque depende de la altura.

@@ -5,6 +5,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 import statistics
+from tqdm import tqdm
 
 # --------------------------- OPCIÓN UNO --------------------------- #
 
@@ -176,6 +177,7 @@ def mostrarGraficasEnPantalla(ejeX, minimos, maximos, media, minHistorico):
     plt.xlabel(' Generación ')
     plt.show()
 
+
 def elitismo(poblacion, listaFitness, cantElite):
     # Creamos una copia de la lista (Fitness u objetivo), elegimos el mejor, lo borramos
     # y volvemos a elegir el mejor. Luego sacamos los indices en el arreglo original.
@@ -195,6 +197,7 @@ def elitismo(poblacion, listaFitness, cantElite):
 
     return elites
 
+
 def Genetico(provincias):
     poblacion = []
     proximaGeneracion = []
@@ -205,9 +208,9 @@ def Genetico(provincias):
 
     # Parametros.
     cantMaximaGeneraciones = 200
+    cantIndividuosEnPoblacion = 50
     p_crossover = 0.9
     p_mutacion = 0.2
-    cantIndividuosEnPoblacion = 50
 
     # arreglos para las graficas.
     mostrarGraficas = True  # si no se quieren mostrar graficas de rendimiento poner en false.
@@ -235,57 +238,58 @@ def Genetico(provincias):
 
     terminado = False
     cantidadCiclos = 0
-    while (terminado == False):
-        cantidadCiclos += 1
-        print("GENERACIÓN ", cantidadCiclos, " LISTA.")
 
-        # aplica el ELITISMO
-        if(hayElitismo):
-            proximaGeneracion += elitismo(poblacion, listaFObjetivo, cantElite)
+    # esta linea es para que se muestre una barra de carga con ciertas opciones
+    with tqdm(total=cantMaximaGeneraciones, ncols=60,
+              bar_format="{desc}: >{percentage:.0f}%|{bar}| Generación: {n_fmt}/{total_fmt}") as barra:
 
+        for i in range(cantMaximaGeneraciones):
+            barra.update()
 
-        for i in range(int((len(poblacion) - cantElite) / 2)):
-            # seleccionar 2 individuos para el cruce
-            padres = seleccionarPareja(poblacion, listaFitness)
-            # cruzar con cierta probabilidad 2 individuos y obtener descendientes
-            hijo1, hijo2 = crossover(padres, p_crossover)
-            # Mutar con cierta probabilidad
-            hijomutado1 = mutacion(hijo1, p_mutacion)
-            hijomutado2 = mutacion(hijo2, p_mutacion)
+            cantidadCiclos += 1
+            # aplica el ELITISMO
+            if(hayElitismo):
+                proximaGeneracion += elitismo(poblacion, listaFObjetivo, cantElite)
 
-            proximaGeneracion.append(hijomutado1)
-            proximaGeneracion.append(hijomutado2)
+            for i in range(int((len(poblacion) - cantElite) / 2)):
+                # seleccionar 2 individuos para el cruce
+                padres = seleccionarPareja(poblacion, listaFitness)
+                # cruzar con cierta probabilidad 2 individuos y obtener descendientes
+                hijo1, hijo2 = crossover(padres, p_crossover)
+                # Mutar con cierta probabilidad
+                hijomutado1 = mutacion(hijo1, p_mutacion)
+                hijomutado2 = mutacion(hijo2, p_mutacion)
 
-        poblacion = proximaGeneracion.copy()
-        proximaGeneracion = []
-        listaFObjetivo = []
-        listaFitness = []
+                proximaGeneracion.append(hijomutado1)
+                proximaGeneracion.append(hijomutado2)
 
-        # rellena funcion fitness y objetivo.
-        listaFitness, listaFObjetivo = rellenarFuncionesObjetivoYFitness(poblacion)
+            poblacion = proximaGeneracion.copy()
+            proximaGeneracion = []
+            listaFObjetivo = []
+            listaFitness = []
 
-        # calculo el mejor
-        menorDistancia = min(listaFObjetivo)
-        if(menorDistancia <= distMinima):
-            distMinima = menorDistancia
-            MejorRecorrido = poblacion[listaFObjetivo.index(menorDistancia)]
+            # rellena funcion fitness y objetivo.
+            listaFitness, listaFObjetivo = rellenarFuncionesObjetivoYFitness(poblacion)
 
-        # guardo los arreglos para generar las graficas
+            # calculo el mejor
+            menorDistancia = min(listaFObjetivo)
+            if(menorDistancia <= distMinima):
+                distMinima = menorDistancia
+                MejorRecorrido = poblacion[listaFObjetivo.index(menorDistancia)]
+
+            # guardo los arreglos para generar las graficas
+            if(mostrarGraficas):
+                # guardo los mejores, peores y la media de esta generacion
+                ejeX.append(cantidadCiclos)
+                minimos.append(min(listaFObjetivo))
+                maximos.append(max(listaFObjetivo))
+                medias.append(statistics.mean(listaFObjetivo))
+                minHistorico.append(distMinima)
+
         if(mostrarGraficas):
-            # guardo los mejores, peores y la media de esta generacion
-            ejeX.append(cantidadCiclos)
-            minimos.append(min(listaFObjetivo))
-            maximos.append(max(listaFObjetivo))
-            medias.append(statistics.mean(listaFObjetivo))
-            minHistorico.append(distMinima)
+            mostrarGraficasEnPantalla(ejeX, minimos, maximos, medias, minHistorico)
 
-        if(cantidadCiclos >= cantMaximaGeneraciones):
-            terminado = True
-
-    if(mostrarGraficas):
-        mostrarGraficasEnPantalla(ejeX, minimos, maximos, medias, minHistorico)
-
-    return datos.mapearRecorrido(MejorRecorrido + [MejorRecorrido[0]]), datos.CalculaDistanciaDeRecorrido(MejorRecorrido)
+        return datos.mapearRecorrido(MejorRecorrido + [MejorRecorrido[0]]), datos.CalculaDistanciaDeRecorrido(MejorRecorrido)
 # --------------------------- MAIN --------------------------- #
 
 
