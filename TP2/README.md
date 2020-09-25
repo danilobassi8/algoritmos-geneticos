@@ -25,7 +25,7 @@ Para su solución, utilizar un  **procedimiento exhaustivo**  que consiste en ev
 | 2       		|600                 |36|
 |  3         	|1200                 |60         |
 
-Teniendo en cuenta que la mochila soporta un máximo de  **3000 grs.**  
+Teniendo en cuenta que la mochila soporta un máximo de  **3000 grs.**.
 
 se pide:
 A) Hallar una solución  **utilizando un algoritmo goloso y exhaustivo**.  
