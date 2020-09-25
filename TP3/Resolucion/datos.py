@@ -77,6 +77,7 @@ def CalculaDistanciaDeRecorrido(r):
     recorridoNumerico = r + [r[0]]
 
     distTotal = 0
+    # tengo que "mapear" el recorrido, porque lo recibí en numeros.
     recorrido = mapearRecorrido(recorridoNumerico)
 
     for i in range(len(recorrido) - 1):

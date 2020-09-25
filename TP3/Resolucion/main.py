@@ -80,9 +80,10 @@ def rellenarFuncionesObjetivoYFitness(poblacion):
     for i in range(len(poblacion)):
         listaFObjetivo.append(funcionObjetivo(poblacion[i]))
 
-    # rellenar F fitness
+    # rellenar F fitness.
     sumatotal = sum(listaFObjetivo)
     arregloComplemento = []
+    # calculo todos sus complementos.
     for i in range(len(listaFObjetivo)):
         arregloComplemento.append(sumatotal - listaFObjetivo[i])
 
@@ -122,17 +123,15 @@ def seleccionarPareja(poblacion, listaFitness):
 
 
 def Crossover_Ciclico(p1, p2):
-
     # se copia para resolver problemas de referencias #
     hijo = p2.copy()
     indexP1 = 0
     sigue = True
     while(sigue):
-        valorP1 = p1[indexP1]
-        hijo[indexP1] = valorP1
+        hijo[indexP1] = p1[indexP1]
 
         valorP2 = p2[indexP1]
-        # actualizo el indice de 1
+        # calculo el indice en el padre 1 donde se encuentra el valorP2
         indexP1 = p1.index(valorP2)
 
         if(valorP2 in hijo):
@@ -236,9 +235,7 @@ def Genetico(provincias):
     distMinima = math.inf
     MejorRecorrido = []
 
-    terminado = False
     cantidadCiclos = 0
-
     # esta linea es para que se muestre una barra de carga con ciertas opciones
     with tqdm(total=cantMaximaGeneraciones, ncols=60,
               bar_format="{desc}: >{percentage:.0f}%|{bar}| Generación: {n_fmt}/{total_fmt}") as barra:
