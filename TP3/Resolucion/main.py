@@ -36,6 +36,7 @@ def MejorRecorrido(provincias):
     distMin = math.inf
     recorridoMin = []
 
+    # invoco el metodo greedy para cada provincia y me quedo con la mejor.
     for p in provincias:
         recorrido, distancia = greedy(p)
         if(distancia < distMin):

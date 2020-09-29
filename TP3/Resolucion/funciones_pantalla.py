@@ -43,7 +43,11 @@ def inicializarPantalla():
     pygame.font.init()
     myfont = pygame.font.SysFont('Arial', 30)
     # cargo la imagen en la variable mapa.
-    mapa = pygame.image.load('arg.png')
+
+    dir_file = os.path.dirname(os.path.abspath(__file__))
+    dir_img = dir_file + "\\arg.png"
+    mapa = pygame.image.load(r"{}".format(dir_img))
+
     # hago que la imagen se ajuste a el tamaño de pantalla.
     mapa = pygame.transform.scale(mapa, (tamaño_x, tamaño_y))
     screen.blit(mapa, (0, 0))
@@ -97,7 +101,6 @@ def realizarRecorrido(recorrido, dist):
     # declaro la fuente de texto.
     pygame.font.init()
     myfont = pygame.font.SysFont('Arial', 30)
-
 
     for i in range(len(recorrido) - 1):
         # dibujo una linea desde la provincia i hasta la i+1.
