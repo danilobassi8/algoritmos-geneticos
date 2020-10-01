@@ -210,7 +210,7 @@ def Genetico(provincias):
     cantMaximaGeneraciones = 200
     cantIndividuosEnPoblacion = 50
     p_crossover = 0.9
-    p_mutacion = 0.2
+    p_mutacion = 0.15
 
     # arreglos para las graficas.
     mostrarGraficas = True  # si no se quieren mostrar graficas de rendimiento poner en false.
@@ -288,6 +288,7 @@ def Genetico(provincias):
             mostrarGraficasEnPantalla(ejeX, minimos, maximos, medias, minHistorico)
 
         return datos.mapearRecorrido(MejorRecorrido + [MejorRecorrido[0]]), datos.CalculaDistanciaDeRecorrido(MejorRecorrido)
+
 # --------------------------- MAIN --------------------------- #
 
 

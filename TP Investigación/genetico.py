@@ -299,7 +299,7 @@ def purgar(m):
 def mutacion(hijo, prob):
     # Inversion mutation con toda una fila elegida al azar.
     r = random.uniform(0, 1)
-    if(r <= 1):
+    if(r <= prob):
         # saco el numero de la fila
         numero = round(random.uniform(0, 9))
         fila = hijo[numero]
