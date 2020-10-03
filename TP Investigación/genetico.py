@@ -257,6 +257,11 @@ def crossover(padres, prob):
                 for f in range(10):
                     hijo2[f][c] = p2[f][c]
 
+        # vuelvo a ejecutar el viento
+        hijo1 = ejecutaViento(hijo1)
+        hijo2 = ejecutaViento(hijo2)
+
+        # los purgo
         hijo1 = purgar(hijo1)
         hijo2 = purgar(hijo2)
     else:
