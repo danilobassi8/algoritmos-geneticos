@@ -367,7 +367,7 @@ def mostrarGraficasEnPantalla(ejeX, minimos, maximos, media, minHistorico):
     # guarda la foto y la muestra
     directorio = os.path.dirname(os.path.abspath("main.py"))
     plt.savefig(directorio + '/img/ultimaCorrida.png')
-    plt.show()
+    
 
 
 def Algoritmo_Genetico(generador):
