@@ -5,7 +5,7 @@
 Hacer un programa que utilice un Algoritmo Genético Canónico para buscar un máximo de la función:
 
 
-f(x) = (x / 2^30 - 1) ^ 2 en el dominio [0, 2^30]
+f(x) = (x / 2^30 - 1) ^ 2 en el dominio [0, 2^30-1]
 
 teniendo en cuenta los siguientes datos:
 <ul>
